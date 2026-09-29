@@ -1,10 +1,10 @@
-"""Check labaratory sensors that are overdue for calibration"""
+"""Check laboratory sensors that are overdue for calibration"""
 
 # Importerer standardbibliotek først, så tredjepartspakker (PEP8)
 import json
 from pathlib import Path
 
-# Verktøy installert via -venv
+# Verktøy installert via .venv
 import pandas as pd
 import yaml
 
