@@ -29,10 +29,21 @@ def read_sensor_data(sensors_path: Path, calibrations_path: Path) -> pd.DataFram
     return sensors.merge(calibrations, on="sensor_id")
 
 
+def find_overdue_sensors(sensor_data:pd.DataFrame, max_days: int) -> list[dict]:
+    """Return sensors where days since calibration exceeds max_days."""
+    # Behold bare radene der antall dager er over grensen
+    overdue = sensor_data[sensor_data["days_since_calibration"] > max_days]
+    # Gjør tabellen om til en liste med dictionaries, én per sensor
+    return overdue.to_dict(orient="records")
+
+
 # Les instillingene fra config.yml
 config = read_config(DATA_DIR / "config.yml")
 
-# Midlertidlig test: sjekk at dataene leses og kobles riktig
+# Les og koble sammen sensordataene
 sensor_data = read_sensor_data(DATA_DIR / "sensors.xlsx", DATA_DIR / "calibrations.csv")
-print(sensor_data)
+
+# Midlertidlig test: sjekk at bare sensorene over grensen blir med
+overdue = find_overdue_sensors(sensor_data, config["max_days_since_calibration"])
+print(overdue)
 
