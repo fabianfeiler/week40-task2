@@ -37,13 +37,23 @@ def find_overdue_sensors(sensor_data:pd.DataFrame, max_days: int) -> list[dict]:
     return overdue.to_dict(orient="records")
 
 
-# Les instillingene fra config.yml
-config = read_config(DATA_DIR / "config.yml")
+def write_json(records: list[dict], path: Path) -> None:
+    """Write a list of dictionaries to a JSON file."""
+    # Åpne filen for skriving ("w") og lagre listen som formatert JSON
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(records, file, indent=2)
 
-# Les og koble sammen sensordataene
-sensor_data = read_sensor_data(DATA_DIR / "sensors.xlsx", DATA_DIR / "calibrations.csv")
 
-# Midlertidlig test: sjekk at bare sensorene over grensen blir med
-overdue = find_overdue_sensors(sensor_data, config["max_days_since_calibration"])
-print(overdue)
+if __name__ == "__main__":
+    # Les instillingene fra config.yml
+    config = read_config(DATA_DIR / "config.yml")
 
+    # Les og koble sammen sensordataene
+    sensor_data = read_sensor_data(DATA_DIR / "sensors.xlsx", DATA_DIR / "calibrations.csv")
+
+    # Finn sensorene som er over grensen
+    overdue = find_overdue_sensors(sensor_data, config["max_days_since_calibration"])
+
+    # Skriv resultatet til filen som er oppgitt i config.yml
+    write_json(overdue, DATA_DIR / config["output_file"])
+    print(f"Wrote {len(overdue)} overdue sensors to {config['output_file']}")
